@@ -205,13 +205,13 @@ void trigger_optionset_string(int opt_idx, int opt_flags, char *oldval, char *ol
   reset_v_option_vars();
 }
 
-static char *illegal_char(char *errbuf, size_t errbuflen, int c)
+static char *illegal_char(char *errbuf, size_t errbuflen, int c, const char* const legal_chars)
 {
   if (errbuf == NULL) {
     return "";
   }
-  vim_snprintf(errbuf, errbuflen, _("E539: Illegal character <%s>"),
-               transchar(c));
+  vim_snprintf(errbuf, errbuflen, _("E539: Illegal character <%s>. Legal characters are among <%s>"),
+               transchar(c), legal_chars);
   return errbuf;
 }
 
@@ -621,14 +621,14 @@ const char *check_stl_option(char *s)
       continue;
     }
     if (vim_strchr(STL_ALL, (uint8_t)(*s)) == NULL) {
-      return illegal_char(errbuf, sizeof(errbuf), (uint8_t)(*s));
+      return illegal_char(errbuf, sizeof(errbuf), (uint8_t)(*s), STL_ALL);
     }
     if (*s == '{') {
       bool reevaluate = (*++s == '%');
 
       if (reevaluate && *++s == '}') {
         // "}" is not allowed immediately after "%{%"
-        return illegal_char(errbuf, sizeof(errbuf), '}');
+        return illegal_char(errbuf, sizeof(errbuf), '}', "Everything but '}'");
       }
       while ((*s != '}' || (reevaluate && s[-1] != '%')) && *s) {
         s++;
@@ -1134,7 +1134,9 @@ const char *did_set_comments(optset_T *args)
     while (*s && *s != ':') {
       if (vim_strchr(COM_ALL, (uint8_t)(*s)) == NULL
           && !ascii_isdigit(*s) && *s != '-') {
-        errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s));
+        char *legal_chars = COM_ALL;
+        vim_snprintf(legal_chars, 12, "%s", "-1234567890");
+        errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s), legal_chars);
         break;
       }
       s++;
@@ -1266,8 +1268,9 @@ static const char *did_set_shada(vimoption_T **opt, int *opt_idx, bool *free_old
   *free_oldval = ((*opt)->flags & P_ALLOCED);
   for (char *s = p_shada; *s;) {
     // Check it's a valid character
-    if (vim_strchr("!\"%'/:<@cfhnrs", (uint8_t)(*s)) == NULL) {
-      return illegal_char(errbuf, errbuflen, (uint8_t)(*s));
+    const char * const valid_chars = "!\"%'/:<@cfhnrs";
+    if (vim_strchr(valid_chars, (uint8_t)(*s)) == NULL) {
+      return illegal_char(errbuf, errbuflen, (uint8_t)(*s), valid_chars);
     }
     if (*s == 'n') {          // name is always last one
       break;
@@ -1576,8 +1579,9 @@ const char *did_set_complete(optset_T *args)
     if (!*s) {
       break;
     }
-    if (vim_strchr(".wbuksid]tU", (uint8_t)(*s)) == NULL) {
-      return illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s));
+    const char * const valid_chars = ".wbuksid]tU";
+    if (vim_strchr(valid_chars, (uint8_t)(*s)) == NULL) {
+      return illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s), valid_chars);
     }
     if (*++s != NUL && *s != ',' && *s != ' ') {
       if (s[-1] == 'k' || s[-1] == 's') {
@@ -1989,7 +1993,7 @@ static const char *did_set_option_listflag(char *val, char *flags, char *errbuf,
 {
   for (char *s = val; *s; s++) {
     if (vim_strchr(flags, (uint8_t)(*s)) == NULL) {
-      return illegal_char(errbuf, errbuflen, (uint8_t)(*s));
+      return illegal_char(errbuf, errbuflen, (uint8_t)(*s), flags);
     }
   }
 
