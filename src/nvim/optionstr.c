@@ -628,7 +628,7 @@ const char *check_stl_option(char *s)
 
       if (reevaluate && *++s == '}') {
         // "}" is not allowed immediately after "%{%"
-        return illegal_char(errbuf, sizeof(errbuf), '}', "Everything but '}'");
+        return illegal_char(errbuf, sizeof(errbuf), '}', "everything but '}'");
       }
       while ((*s != '}' || (reevaluate && s[-1] != '%')) && *s) {
         s++;
