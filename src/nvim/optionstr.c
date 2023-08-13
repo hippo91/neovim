@@ -205,12 +205,13 @@ void trigger_optionset_string(int opt_idx, int opt_flags, char *oldval, char *ol
   reset_v_option_vars();
 }
 
-static char *illegal_char(char *errbuf, size_t errbuflen, int c, const char* const legal_chars)
+static char *illegal_char(char *errbuf, size_t errbuflen, int c, const char * const legal_chars)
 {
   if (errbuf == NULL) {
     return "";
   }
-  vim_snprintf(errbuf, errbuflen, _("E539: Illegal character <%s>. Legal characters are among <%s>"),
+  vim_snprintf(errbuf, errbuflen, _(
+                                   "E539: Illegal character <%s>. Legal characters are among <%s>"),
                transchar(c), legal_chars);
   return errbuf;
 }
@@ -1134,7 +1135,8 @@ const char *did_set_comments(optset_T *args)
     while (*s && *s != ':') {
       if (vim_strchr(COM_ALL, (uint8_t)(*s)) == NULL
           && !ascii_isdigit(*s) && *s != '-') {
-        errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s), COM_ALL "-1234567890");
+        errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s),
+                              COM_ALL "-1234567890");
         break;
       }
       s++;
