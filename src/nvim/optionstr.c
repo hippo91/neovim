@@ -1134,9 +1134,7 @@ const char *did_set_comments(optset_T *args)
     while (*s && *s != ':') {
       if (vim_strchr(COM_ALL, (uint8_t)(*s)) == NULL
           && !ascii_isdigit(*s) && *s != '-') {
-        char *legal_chars = COM_ALL;
-        vim_snprintf(legal_chars, 12, "%s", "-1234567890");
-        errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s), legal_chars);
+        errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, (uint8_t)(*s), COM_ALL "-1234567890");
         break;
       }
       s++;
