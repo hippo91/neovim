@@ -3381,7 +3381,7 @@ describe('API', function()
          pcall_err(meths.eval_statusline, '', { fillchar = 1 }))
     end)
     it('rejects invalid string', function()
-      eq('E539: Illegal character <}>',
+      eq('E539: Illegal character <}>. Legal characters are among <everything but \'}\'>',
          pcall_err(meths.eval_statusline, '%{%}', {}))
     end)
     it('supports various items', function()
