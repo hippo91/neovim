@@ -3390,6 +3390,10 @@ describe('API', function()
       eq('E539: Illegal character <}>. Legal characters are among <everything but \'}\'>',
          pcall_err(meths.eval_statusline, '%{%}', {}))
     end)
+    it('rejects invalid character', function()
+      eq('E539: Illegal character <Z>. Legal characters are among <fFtcvVlLnkoObBrRhHyYwWmMqpPaNSCs{=<*#TX@TX@>',
+         pcall_err(meths.eval_statusline, '%Z', {}))
+    end)
     it('supports various items', function()
       eq({ str = '0', width = 1 },
          meths.eval_statusline('%l', { maxwidth = 5 }))
