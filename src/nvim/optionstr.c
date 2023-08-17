@@ -580,7 +580,7 @@ static int check_signcolumn(char *val)
 const char *check_stl_option(char *s)
 {
   int groupdepth = 0;
-  static char errbuf[80];
+  static char errbuf[110];
 
   while (*s) {
     // Check for valid keys after % sequences
